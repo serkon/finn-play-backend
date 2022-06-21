@@ -1,0 +1,67 @@
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+  },
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 13,
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint'],
+  rules: {
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn'],
+    'semi': ['error', 'always'],
+    'semi-style': ['error', 'last'],
+    'no-extra-semi': 'error',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'eol-last': ['error', 'always'],
+    'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-restricted-imports': ['error', { patterns: ['../*'] }],
+    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+    'linebreak-style': 0,
+    'arrow-body-style': ['error', 'as-needed'],
+    'indent': 'off',
+    'quotes': ['error', 'single', { allowTemplateLiterals: true }],
+    'no-multi-spaces': 'error',
+    'no-trailing-spaces': 'error',
+    'space-before-function-paren': [
+      'error',
+      {
+        anonymous: 'never',
+        named: 'never',
+        asyncArrow: 'always',
+      },
+    ],
+    'padded-blocks': ['error', { classes: 'never', blocks: 'never' }],
+    'padding-line-between-statements': [
+      'warn',
+      { blankLine: 'always', prev: '*', next: 'function' },
+      { blankLine: 'always', prev: 'function', next: '*' },
+    ],
+    'arrow-spacing': ['error', { before: true, after: true }],
+    'max-len': ['error', { code: 180, ignoreUrls: true }],
+    // "no-mixed-operators": "error",
+    'spaced-comment': [
+      'error',
+      'always',
+      {
+        line: {
+          markers: ['/'],
+          exceptions: ['-', '+'],
+        },
+        block: {
+          markers: ['!'],
+          exceptions: ['*'],
+          balanced: true,
+        },
+      },
+    ],
+  },
+};

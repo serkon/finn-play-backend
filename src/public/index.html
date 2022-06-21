@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload | We Love Kittens!</title>
+</head>
+
+<body>
+  <form role="form" class="form" onsubmit="return false;">
+    <div class="form-group">
+      <label for="file">File</label>
+      <input id="file" type="file" class="form-control" multiple />
+    </div>
+    <button id="upload" type="button" class="btn btn-primary">Upload</button>
+  </form>
+  <div id="list"></div>
+  <div id="output" class="container"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+  <script>
+    var output = document.getElementById('output');
+    var list = document.getElementById('list');
+    document.getElementById('upload').onclick = function () {
+      var files = document.getElementById('file').files;
+      // var data = new FormData();
+      // data.append('foo', 'bar');
+      //  for(file of files){
+      //    data.append('file', file, file.name);
+      //  }
+      // var config = {
+      //   onUploadProgress: function (progressEvent) {
+      //     var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      //     console.log(percentCompleted);
+      //   }
+      // };
+      // axios.put('/api/upload', data, config)
+      //   .then(function (res) {
+      //     output.className = 'container';
+      //     output.innerHTML = res.data;
+      //   })
+      //   .catch(function (err) {
+      //     output.className = 'container text-danger';
+      //     output.innerHTML = err.message;
+      //   });
+
+      let tokens = [];
+      let progress = [];
+      const myUploadProgress = (myFileId) => {
+        return (progress) => {
+          let percentage = Math.floor((progress.loaded * 100) / progress.total)
+          progress[myFileId] = percentage;
+          // console.log(myFileId, percentage);
+        }
+      }
+
+      const myCancelUpload = (myFileId) => {
+        return new axios.CancelToken(
+          cancel => (tokens[myFileId] = cancel)
+        );
+      }
+
+      for (var i = 0; i < files.length; i++) {
+        var config = {
+          onUploadProgress: myUploadProgress(files[i].name),
+          cancelToken: myCancelUpload(files[i].name)
+        };
+        var data = new FormData();
+        data.append('file', files[i], files[i].name);
+        axios.put('/api/upload', data, config)
+          .then(function (res) {
+            output.className = 'container';
+            output.innerHTML += res.data;
+          })
+          .catch(err => {
+            console.log(err);
+            if (axios.isCancel(err)) {
+              alert(err.message);
+            }
+          });
+
+        var divElement = document.createElement('div');
+        var button = document.createElement("button");
+        button.innerText = "Clicker" + i;
+        button.addEventListener('click',((i) => {
+          return  ()=> {
+          console.log(i);
+          console.log(files[i]);
+          tokens[files[i].name]('Operation canceled by the user.')
+        }
+        })(i));
+        divElement.appendChild(button);
+        list.appendChild(divElement);
+      }
+    };
+  </script>
+
+  <img src="assets/remove.jpg" width="100px"/>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="input" autocomplete="off" /><button>Send</button>
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    var socket = io();
+
+    var messages = document.getElementById('messages');
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (input.value) {
+        console.log("trigger");
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
+
+    socket.on('chat message', function(msg) {
+      var item = document.createElement('li');
+      item.textContent = msg;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</body>
+
+</html>
